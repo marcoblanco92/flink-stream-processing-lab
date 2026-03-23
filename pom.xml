@@ -14,7 +14,7 @@
 
     <name>flink-stream-processing-lab</name>
     <modules>
-        <module>lab-01-hello-flink</module>
+        <module>lab-01-operators</module>
     </modules>
 
     <properties>
