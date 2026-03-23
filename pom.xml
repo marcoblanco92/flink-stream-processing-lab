@@ -15,6 +15,7 @@
     <name>flink-stream-processing-lab</name>
     <modules>
         <module>lab-01-operators</module>
+        <module>lab-02-distribution-strategies</module>
     </modules>
 
     <properties>
