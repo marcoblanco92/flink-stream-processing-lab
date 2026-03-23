@@ -16,6 +16,8 @@
     <modules>
         <module>lab-01-operators</module>
         <module>lab-02-distribution-strategies</module>
+        <module>lab-03-connect-and-process</module>
+        <module>common</module>
     </modules>
 
     <properties>

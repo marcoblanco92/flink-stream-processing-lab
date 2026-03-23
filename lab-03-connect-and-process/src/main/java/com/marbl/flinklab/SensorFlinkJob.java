@@ -4,17 +4,14 @@ package com.marbl.flinklab;
 import com.marbl.flinklab.model.SensorReading;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.util.Collector;
 
 /***
  * Read a sequence of IoT sensor readings
- * Generate zero, one or two alerts based on temperature:
- *   - temp < 40°C          → no alert
- *   - 40°C <= temp < 45°C  → 1 alert: "WARNING: sensor-X at XX.X°C"
- *   - temp >= 45°C         → 2 alerts: "WARNING: ..." + "CRITICAL: sensor-X IMMEDIATE ACTION"
- * Print alerts to stdout
+ * Filter readings with temperature above 40°C (anomalies)
+ * Format the anomaly message: "ANOMALY: sensor-X detected XX.X°C"
+ * Print anomalies to stdout
  ***/
-public class AlertFlinkJob {
+public class SensorFlinkJob {
     public static void main(String[] args) throws Exception {
 
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment().setParallelism(4);
@@ -34,23 +31,14 @@ public class AlertFlinkJob {
                 new SensorReading("sensor-1", 47.5, now + 9000)
         );
 
-        DataStream<String> anomalies = stream.flatMap((SensorReading sensorReading, Collector<String> collector) -> {
-            if (sensorReading.getTemperature() >= 40.0 && sensorReading.getTemperature() < 45.0)
-                collector.collect(String.format("WARNING: %s at %.1f°C",
-                        sensorReading.getSensorId(),
-                        sensorReading.getTemperature()
-                ));
-
-            if (sensorReading.getTemperature() >= 45.0) {
-                collector.collect(String.format("WARNING: %s at %.1f°C",
-                        sensorReading.getSensorId(),
-                        sensorReading.getTemperature()
-                ));
-                collector.collect(String.format("CRITICAL: %s IMMEDIATE ACTION",
-                        sensorReading.getSensorId()
-                ));
-            }
-        }).returns(String.class);
+        DataStream<String> anomalies = stream
+                .filter(sensorReading -> sensorReading.getTemperature() > 40.0)
+                .map((SensorReading sensorReading) ->
+                        String.format("ANOMALY: %s detected %.1f°C",
+                                sensorReading.getSensorId(),
+                                sensorReading.getTemperature()
+                        )
+                );
 
         anomalies.print();
 

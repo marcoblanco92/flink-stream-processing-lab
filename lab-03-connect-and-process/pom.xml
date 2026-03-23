@@ -11,7 +11,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>lab-02-distribution-strategies</artifactId>
+    <artifactId>lab-03-connect-and-process</artifactId>
 
     <dependencies>
         <dependency>
